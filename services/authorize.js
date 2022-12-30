@@ -5,22 +5,22 @@ const db = require('context/dbcontext');
 module.exports = authorize;
 
 function authorize() {
-    return [
-        // authenticate JWT token and attach decoded token to request as req.user
+	return [
+		// authenticate JWT token and attach decoded token to request as req.user
 		expressJwt({ secret, algorithms: ['HS256'] }),
 
-        // attach full user record to request object
-        async (req, res, next) => {
-            // get user with id from token 'sub' (subject) property
-            const user = await db.User.findByPk(req.user.sub);
+		// attach full user record to request object
+		async (req, res, next) => {
+			// get user with id from token 'sub' (subject) property
+			const user = await db.Users.findByPk(req.auth.sub);
 
-            // check user still exists
-            if (!user)
-                return res.status(401).json({ message: 'Unauthorized' });
+			// check user still exists
+			if (!user)
+				return res.status(401).json({ message: 'Unauthorized' });
 
-            // authorization successful
-            req.user = user.get();
-            next();
-        }
-    ];
+			// authorization successful
+			req.user = user.get();
+			next();
+		}
+	];
 }
